@@ -158,29 +158,28 @@
         </button>
     </div>
 
-    <table>
-
-        <thead>
-
-            <tr>
-                <th>Nome</th>
-                <th>Telefone</th>
-                <th>Data</th>
-                <th>Horário</th>
-                <th>Pessoas</th>
-                <th>Ambiente</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-
-        </thead>
-
-        <tbody id="tabelaReservas">
-
-        </tbody>
-
     </table>
+</div>
 
+<!-- MODAL -->
+
+<div id="modalReserva" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h2>Reserva DAM</h2>
+
+        <p><strong>Nome:</strong> <span id="mNome"></span></p>
+        <p><strong>Telefone:</strong> <span id="mTelefone"></span></p>
+        <p><strong>Data:</strong> <span id="mData"></span></p>
+        <p><strong>Horário:</strong> <span id="mHorario"></span></p>
+        <p><strong>Pessoas:</strong> <span id="mPessoas"></span></p>
+        <p><strong>Ambiente:</strong> <span id="mAmbiente"></span></p>
+        <p><strong>Observações:</strong> <span id="mObs"></span></p>
+        <p><strong>Status:</strong> <span id="mStatus"></span></p>
+
+        <button id="btnConfirmar">Confirmar</button>
+        <button id="btnCancelar">Cancelar</button>
+        <button onclick="fecharModal()">Fechar</button>
+    </div>
 </div>
 
 <script src="supabase.js"></script>
