@@ -1,14 +1,14 @@
 async function carregarReservas() {
 
     const { data, error } = await supabaseClient
-        .from("reservas")
-        .select(`
-            *,
-            clientes 
-                nome,
-                telefone
-            )
-        `);
+    .from("reservas")
+    .select(`
+        *,
+        clientes (
+            nome,
+            telefone
+        )
+    `);
         
 console.log("ERRO:", error);
 console.log("DADOS:", data);
