@@ -9,6 +9,8 @@ async function carregarReservas() {
             telefone
         )
     `);
+
+    console.log(data[0]);
         
 console.log("ERRO:", error);
 console.log("DADOS:", data);
