@@ -1,3 +1,5 @@
+let reservas = [];
+
 async function carregarReservas() {
 
     const { data, error } = await supabaseClient
@@ -9,6 +11,8 @@ async function carregarReservas() {
         telefone
     )
 `);
+
+reservas = data;
 
     console.log(data[0]);
         
@@ -37,7 +41,7 @@ console.log("DADOS:", data);
                 <td>${reserva.ambiente_pref ?? "-"}</td>
                 <td>${reserva.status ?? "-"}</td>
                 <td>
-                    <button>Ver</button>
+                    <button onclick="abrirModal('${reserva.id}')">Ver</button>
                 </td>
             </tr>
         `;
@@ -47,3 +51,40 @@ console.log("DADOS:", data);
 }
 
 carregarReservas();
+function abrirModal(id) {
+    console.log("ABRIU O MODAL", id);
+
+    const reserva = reservas.find(r => r.id === id);
+
+    if (!reserva) return;
+
+    document.getElementById("mNome").textContent =
+        reserva.clientes?.nome ?? "-";
+
+    document.getElementById("mTelefone").textContent =
+        reserva.clientes?.telefone ?? "-";
+
+    document.getElementById("mData").textContent =
+        reserva.data_reserva ?? "-";
+
+    document.getElementById("mHorario").textContent =
+        reserva.horario ?? "-";
+
+    document.getElementById("mPessoas").textContent =
+        reserva.pessoas ?? "-";
+
+    document.getElementById("mAmbiente").textContent =
+        reserva.ambiente_pref ?? "-";
+
+    document.getElementById("mObs").textContent =
+        reserva.observacoes ?? "-";
+
+    document.getElementById("mStatus").textContent =
+        reserva.status ?? "-";
+
+    document.getElementById("modalReserva").style.display = "block";
+}
+
+function fecharModal() {
+    document.getElementById("modalReserva").style.display = "none";
+}
