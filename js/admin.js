@@ -41,7 +41,7 @@ console.log("DADOS:", data);
                 <td>${reserva.ambiente_pref ?? "-"}</td>
                 <td>${reserva.status ?? "-"}</td>
                 <td>
-                    <button onclick="alert('clicou')">Ver</button>
+                   <button onclick="abrirModal('${reserva.id}')">Ver</button>
                 </td>
             </tr>
         `;
