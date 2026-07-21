@@ -52,29 +52,35 @@ console.log("DADOS:", data);
 
 carregarReservas();
 window.abrirModal = function(id) {
-    console.log("ABRIU O MODAL", id);
+    const reserva = reservas.find(r => String(r.id) === String(id));
 
-    const reserva = reservas.find(r => r.id === id);
+if (!reserva) return;
 
-    if (!reserva) return;
+document.getElementById("mNome").textContent =
+    reserva.clientes?.nome ?? "-";
 
-    const ids = [
-  "modalReserva",
-  "mNome",
-  "mTelefone",
-  "mData",
-  "mHorario",
-  "mPessoas",
-  "mAmbiente",
-  "mObs",
-  "mStatus"
-];
+document.getElementById("mTelefone").textContent =
+    reserva.clientes?.telefone ?? "-";
 
-ids.forEach(id => {
-  console.log(id, document.getElementById(id));
-});
+document.getElementById("mData").textContent =
+    reserva.data_reserva ?? "-";
 
-    document.getElementById("modalReserva").style.display = "block";
+document.getElementById("mHorario").textContent =
+    reserva.horario ?? "-";
+
+document.getElementById("mPessoas").textContent =
+    reserva.pessoas ?? "-";
+
+document.getElementById("mAmbiente").textContent =
+    reserva.ambiente_pref ?? "-";
+
+document.getElementById("mObs").textContent =
+    reserva.observacoes ?? "-";
+
+document.getElementById("mStatus").textContent =
+    reserva.status ?? "-";
+
+document.getElementById("modalReserva").style.display = "block";
 }
 
 function fecharModal() {
