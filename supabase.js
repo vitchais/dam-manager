@@ -15,7 +15,7 @@
 
 // TODO: troque pelos valores reais do seu projeto Supabase.
 // Encontrados em: Painel do Supabase > Project Settings > API.
-const SUPABASE_URL = 'https://sfrovrevzqrfrmmimpyl.supabase.co';
+const SUPABASE_URL = 'https://sfrovrevzqrfrmmlmpyi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Uw_kAW3iu2xH0FQXUNdPWA_deDzfXoI';
 
 // A chave "anon" é pública por natureza (fica visível no navegador) — a
