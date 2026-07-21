@@ -9,7 +9,9 @@ async function carregarReservas() {
                 telefone
             )
         `);
-
+        
+console.log("ERRO:", error);
+console.log("DADOS:", data);
     if (error) {
         console.error(error);
         alert("Erro ao carregar reservas.");
