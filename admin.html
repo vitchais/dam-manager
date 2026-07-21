@@ -1,185 +1,265 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel DAM</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel DAM</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, Helvetica, sans-serif;
-        }
+<style>
 
-        body{
-            background:#111;
-            color:white;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
 
-        header{
-            background:#ff7a00;
-            padding:20px;
-            text-align:center;
-            font-size:28px;
-            font-weight:bold;
-        }
+body{
+background:#111;
+color:#fff;
+}
 
-        .container{
-            width:95%;
-            max-width:1400px;
-            margin:auto;
-            padding:30px 0;
-        }
+header{
+background:#ff7a00;
+padding:20px;
+font-size:30px;
+font-weight:bold;
+text-align:center;
+}
 
-        .cards{
-            display:grid;
-            grid-template-columns:repeat(4,1fr);
-            gap:20px;
-            margin-bottom:30px;
-        }
+.container{
+width:95%;
+max-width:1400px;
+margin:auto;
+padding:30px 0;
+}
 
-        .card{
-            background:#1d1d1d;
-            border-radius:12px;
-            padding:25px;
-        }
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;
+margin-bottom:30px;
+}
 
-        .card h2{
-            color:#888;
-            font-size:15px;
-            margin-bottom:15px;
-        }
+.card{
+background:#1d1d1d;
+padding:25px;
+border-radius:12px;
+text-align:center;
+}
 
-        .card h1{
-            color:#ff7a00;
-            font-size:42px;
-        }
+.card h3{
+font-size:15px;
+color:#999;
+margin-bottom:10px;
+}
 
-        .barra{
-            display:flex;
-            gap:15px;
-            margin-bottom:25px;
-        }
+.card h1{
+font-size:42px;
+color:#ff7a00;
+}
 
-        input{
-            flex:1;
-            padding:14px;
-            border:none;
-            border-radius:8px;
-            background:#222;
-            color:white;
-        }
+.topo{
+display:flex;
+gap:15px;
+margin-bottom:20px;
+}
 
-        button{
-            background:#ff7a00;
-            color:white;
-            border:none;
-            padding:14px 25px;
-            border-radius:8px;
-            cursor:pointer;
-            font-weight:bold;
-        }
+.topo input{
+flex:1;
+padding:14px;
+border:none;
+border-radius:8px;
+background:#222;
+color:#fff;
+}
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-            background:#1d1d1d;
-            border-radius:10px;
-            overflow:hidden;
-        }
+.topo button{
+padding:14px 25px;
+background:#ff7a00;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+color:#fff;
+}
 
-        th{
-            background:#ff7a00;
-            padding:15px;
-        }
+table{
+width:100%;
+border-collapse:collapse;
+background:#1d1d1d;
+overflow:hidden;
+border-radius:10px;
+}
 
-        td{
-            padding:15px;
-            border-bottom:1px solid #2d2d2d;
-            text-align:center;
-        }
+thead{
+background:#ff7a00;
+}
 
-        tr:hover{
-            background:#252525;
-        }
+th{
+padding:15px;
+}
 
-        .acoes button{
-            margin:3px;
-        }
-    </style>
+td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #2a2a2a;
+}
+
+tr:hover{
+background:#252525;
+}
+
+button.ver{
+background:#ff7a00;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+color:white;
+}
+
+.modal{
+display:none;
+position:fixed;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.75);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+width:500px;
+max-width:95%;
+background:#1d1d1d;
+padding:25px;
+border-radius:12px;
+}
+
+.modal-content h2{
+margin-bottom:20px;
+}
+
+.modal-content p{
+margin-bottom:12px;
+}
+
+.modal-content button{
+margin-top:15px;
+margin-right:10px;
+}
+
+</style>
 
 </head>
 
 <body>
 
 <header>
-    Painel Administrativo DAM
+PAINEL ADMINISTRATIVO DAM
 </header>
 
 <div class="container">
 
-    <div class="cards">
+<div class="cards">
 
-        <div class="card">
-            <h2>Reservas Hoje</h2>
-            <h1 id="hoje">0</h1>
-        </div>
-
-        <div class="card">
-            <h2>Pendentes</h2>
-            <h1 id="pendentes">0</h1>
-        </div>
-
-        <div class="card">
-            <h2>Confirmadas</h2>
-            <h1 id="confirmadas">0</h1>
-        </div>
-
-        <div class="card">
-            <h2>Canceladas</h2>
-            <h1 id="canceladas">0</h1>
-        </div>
-
-    </div>
-
-    <div class="barra">
-        <input
-            type="text"
-            id="pesquisa"
-            placeholder="Pesquisar por nome ou telefone">
-
-        <button onclick="carregarReservas()">
-            Atualizar
-        </button>
-    </div>
-
-    </table>
+<div class="card">
+<h3>Reservas Hoje</h3>
+<h1 id="hoje">0</h1>
 </div>
 
-<!-- MODAL -->
+<div class="card">
+<h3>Pendentes</h3>
+<h1 id="pendentes">0</h1>
+</div>
 
-<div id="modalReserva" class="modal" style="display:none;">
-    <div class="modal-content">
-        <h2>Reserva DAM</h2>
+<div class="card">
+<h3>Confirmadas</h3>
+<h1 id="confirmadas">0</h1>
+</div>
 
-        <p><strong>Nome:</strong> <span id="mNome"></span></p>
-        <p><strong>Telefone:</strong> <span id="mTelefone"></span></p>
-        <p><strong>Data:</strong> <span id="mData"></span></p>
-        <p><strong>Horário:</strong> <span id="mHorario"></span></p>
-        <p><strong>Pessoas:</strong> <span id="mPessoas"></span></p>
-        <p><strong>Ambiente:</strong> <span id="mAmbiente"></span></p>
-        <p><strong>Observações:</strong> <span id="mObs"></span></p>
-        <p><strong>Status:</strong> <span id="mStatus"></span></p>
+<div class="card">
+<h3>Canceladas</h3>
+<h1 id="canceladas">0</h1>
+</div>
 
-        <button id="btnConfirmar">Confirmar</button>
-        <button id="btnCancelar">Cancelar</button>
-        <button onclick="fecharModal()">Fechar</button>
-    </div>
+</div>
+
+<div class="topo">
+
+<input
+id="pesquisa"
+type="text"
+placeholder="Pesquisar reserva...">
+
+<button onclick="carregarReservas()">
+Atualizar
+</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Nome</th>
+<th>Telefone</th>
+<th>Data</th>
+<th>Horário</th>
+<th>Pessoas</th>
+<th>Ambiente</th>
+<th>Status</th>
+<th>Ações</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tabelaReservas">
+
+</tbody>
+
+</table>
+
+</div>
+
+<div class="modal" id="modalReserva">
+
+<div class="modal-content">
+
+<h2>Reserva</h2>
+
+<p><strong>Nome:</strong> <span id="mNome"></span></p>
+
+<p><strong>Telefone:</strong> <span id="mTelefone"></span></p>
+
+<p><strong>Data:</strong> <span id="mData"></span></p>
+
+<p><strong>Horário:</strong> <span id="mHorario"></span></p>
+
+<p><strong>Pessoas:</strong> <span id="mPessoas"></span></p>
+
+<p><strong>Ambiente:</strong> <span id="mAmbiente"></span></p>
+
+<p><strong>Observações:</strong> <span id="mObs"></span></p>
+
+<p><strong>Status:</strong> <span id="mStatus"></span></p>
+
+<button id="btnConfirmar">Confirmar</button>
+
+<button id="btnCancelar">Cancelar</button>
+
+<button onclick="fecharModal()">Fechar</button>
+
+</div>
+
 </div>
 
 <script src="supabase.js"></script>
