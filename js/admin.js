@@ -3,12 +3,12 @@ async function carregarReservas() {
     const { data, error } = await supabaseClient
     .from("reservas")
     .select(`
-        *,
-        clientes (
-            nome,
-            telefone
-        )
-    `);
+    *,
+    clientes!reservas_cliente_id_fkey (
+        nome,
+        telefone
+    )
+`);
 
     console.log(data[0]);
         
@@ -20,7 +20,7 @@ console.log("DADOS:", data);
         return;
     }
 
-    console.log(data);
+    console.log("TESTE NOVO");
 
     const tabela = document.getElementById("tabelaReservas");
     tabela.innerHTML = "";
@@ -33,8 +33,8 @@ console.log("DADOS:", data);
                 <td>${reserva.clientes?.telefone ?? "-"}</td>
                 <td>${reserva.data_reserva ?? "-"}</td>
                 <td>${reserva.horario ?? "-"}</td>
-                <td>${reserva.quantidade_pessoas ?? "-"}</td>
-                <td>${reserva.ambiente ?? "-"}</td>
+                <td>${reserva.pessoas ?? "-"}</td>
+                <td>${reserva.ambiente_pref ?? "-"}</td>
                 <td>${reserva.status ?? "-"}</td>
                 <td>
                     <button>Ver</button>
