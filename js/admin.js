@@ -58,29 +58,21 @@ window.abrirModal = function(id) {
 
     if (!reserva) return;
 
-    document.getElementById("mNome").textContent =
-        reserva.clientes?.nome ?? "-";
+    const ids = [
+  "modalReserva",
+  "mNome",
+  "mTelefone",
+  "mData",
+  "mHorario",
+  "mPessoas",
+  "mAmbiente",
+  "mObs",
+  "mStatus"
+];
 
-    document.getElementById("mTelefone").textContent =
-        reserva.clientes?.telefone ?? "-";
-
-    document.getElementById("mData").textContent =
-        reserva.data_reserva ?? "-";
-
-    document.getElementById("mHorario").textContent =
-        reserva.horario ?? "-";
-
-    document.getElementById("mPessoas").textContent =
-        reserva.pessoas ?? "-";
-
-    document.getElementById("mAmbiente").textContent =
-        reserva.ambiente_pref ?? "-";
-
-    document.getElementById("mObs").textContent =
-        reserva.observacoes ?? "-";
-
-    document.getElementById("mStatus").textContent =
-        reserva.status ?? "-";
+ids.forEach(id => {
+  console.log(id, document.getElementById(id));
+});
 
     document.getElementById("modalReserva").style.display = "block";
 }
