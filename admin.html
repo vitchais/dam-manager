@@ -186,6 +186,7 @@
 <script src="supabase.js"></script>
 
 <script>
+
 async function carregarReservas() {
 
     const { data, error } = await supabaseClient
@@ -198,11 +199,32 @@ async function carregarReservas() {
         return;
     }
 
-    console.log(data);
+    const tabela = document.getElementById("tabelaReservas");
+    tabela.innerHTML = "";
+
+    data.forEach(reserva => {
+
+        tabela.innerHTML += `
+            <tr>
+                <td>${reserva.codigo ?? "-"}</td>
+                <td>-</td>
+                <td>${reserva.data_reserva ?? "-"}</td>
+                <td>${reserva.horario ?? "-"}</td>
+                <td>${reserva.quantidade_pessoas ?? "-"}</td>
+                <td>${reserva.ambiente ?? "-"}</td>
+                <td>${reserva.status ?? "-"}</td>
+                <td>
+                    <button>Ver</button>
+                </td>
+            </tr>
+        `;
+
+    });
 
 }
 
 carregarReservas();
+
 </script>
 
 </body>
