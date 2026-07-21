@@ -4,7 +4,7 @@ async function carregarReservas() {
         .from("reservas")
         .select(`
             *,
-            clientes!cliente_id ( (
+            clientes 
                 nome,
                 telefone
             )
