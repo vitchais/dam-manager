@@ -41,7 +41,7 @@ console.log("DADOS:", data);
                 <td>${reserva.ambiente_pref ?? "-"}</td>
                 <td>${reserva.status ?? "-"}</td>
                 <td>
-                    <button onclick="abrirModal('${reserva.id}')">Ver</button>
+                    <button onclick="alert('clicou')">Ver</button>
                 </td>
             </tr>
         `;
@@ -51,7 +51,7 @@ console.log("DADOS:", data);
 }
 
 carregarReservas();
-function abrirModal(id) {
+window.abrirModal = function(id) {
     console.log("ABRIU O MODAL", id);
 
     const reserva = reservas.find(r => r.id === id);
