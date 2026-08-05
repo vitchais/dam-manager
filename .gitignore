@@ -8,3 +8,6 @@ npm-debug.log*
 .idea/
 coverage/
 *.log
+railway-app.env
+railway-evolution.env
+qrcode-whatsapp.png
