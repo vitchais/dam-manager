@@ -20,6 +20,7 @@ import { env, features, validarConfiguracao } from './config/env.js';
 import { logger } from './lib/logger.js';
 import { webhookRouter } from './routes/webhook.js';
 import { apiRouter } from './routes/api.js';
+import { whatsappRouter } from './routes/whatsapp.js';
 import { healthRouter } from './routes/health.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   // O painel não pode ser indexado nem cacheado por proxies.
-  if (req.path.startsWith('/api') || req.path === '/admin.html') {
+  if (req.path.startsWith('/api') || req.path === '/admin.html' || req.path === '/whatsapp.html') {
     res.set('Cache-Control', 'no-store');
     res.set('X-Robots-Tag', 'noindex, nofollow');
   }
@@ -45,6 +46,7 @@ app.use((req, res, next) => {
 });
 
 app.use(healthRouter);
+app.use('/api/whatsapp', whatsappRouter);
 app.use('/api', apiRouter);
 app.use('/webhook', webhookRouter);
 
@@ -73,6 +75,7 @@ function resumo() {
   logger.info(`  Ambiente: ${env.nodeEnv}   Fuso: ${env.timezone}`);
   logger.info(`  Site:     http://localhost:${env.port}/`);
   logger.info(`  Painel:   http://localhost:${env.port}/admin.html`);
+  logger.info(`  WhatsApp: http://localhost:${env.port}/whatsapp.html`);
   logger.info(`  Status:   http://localhost:${env.port}/status`);
   logger.info('');
   logger.info('  Recursos:');

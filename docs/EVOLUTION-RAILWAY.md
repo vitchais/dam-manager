@@ -125,39 +125,35 @@ Não defina `PORT` — o Railway injeta sozinho.
 
 ---
 
-## Passo 7 — Conectar o WhatsApp
+## Passo 7 — Conectar o WhatsApp (pelo navegador)
 
-Com os dois serviços no ar, rode **na sua máquina**, com um `.env` local
-apontando para a Evolution de produção:
+Com os dois serviços no ar, abra:
 
-```bash
-npm run setup:evolution
+```
+https://<seu-app>.up.railway.app/whatsapp.html
 ```
 
-O script:
-1. cria a instância `dam`;
-2. aponta o webhook para `APP_URL/webhook/evolution?token=...`;
-3. salva `qrcode-whatsapp.png` na pasta do projeto.
+Entre com a `ADMIN_PASSWORD` e siga os dois botões:
 
-Abra o PNG e escaneie:
-**WhatsApp → Configurações → Aparelhos conectados → Conectar aparelho**
+1. **Preparar conexão** — cria a instância `dam` e cadastra o webhook
+   apontando para `APP_URL/webhook/evolution?token=...`
+2. **Gerar QR Code** — mostra o QR na tela
 
-Confirme com:
+No celular do DAM: **WhatsApp → Configurações → Aparelhos conectados →
+Conectar aparelho** e aponte a câmera para o QR.
+
+A página confere o status sozinha a cada 5 segundos e avisa quando conectar.
+Se o QR expirar (uns 40 segundos), é só gerar outro.
+
+### Alternativa pelo terminal
+
+Se preferir linha de comando, com um `.env` local apontando para a Evolution
+de produção:
 
 ```bash
-npm run check
+npm run setup:evolution   # cria instância, cadastra webhook, salva o QR em PNG
+npm run check             # confirma que tudo respondeu
 ```
-
-Ou abra `https://<seu-app>.up.railway.app/status` no navegador.
-
-### Alternativa pelo navegador
-
-Se preferir não rodar o script, use o Manager que vem com a Evolution:
-`https://<evolution>.up.railway.app/manager` — entre com a
-`AUTHENTICATION_API_KEY`, crie a instância `dam`, escaneie o QR e cadastre o
-webhook manualmente apontando para
-`https://<seu-app>.up.railway.app/webhook/evolution?token=<WEBHOOK_TOKEN>`
-com os eventos `MESSAGES_UPSERT` e `CONNECTION_UPDATE`.
 
 ---
 

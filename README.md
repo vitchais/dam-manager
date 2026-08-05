@@ -8,6 +8,7 @@ Um único processo Node serve tudo:
 |---|---|
 | `/` | Site do DAM (`public/index.html`) |
 | `/admin.html` | Painel de reservas, protegido por senha |
+| `/whatsapp.html` | Conectar o WhatsApp (QR Code), protegido por senha |
 | `/api/*` | API do painel |
 | `/webhook/evolution` | Entrada das mensagens de WhatsApp |
 | `/health` | Checagem usada pelo Railway |
