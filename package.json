@@ -1,0 +1,23 @@
+{
+  "name": "dam-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site, painel administrativo e chatbot de WhatsApp do DAM Gastrobar",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "node --watch --no-deprecation src/server.js",
+    "start": "node --no-deprecation src/server.js",
+    "check": "node --no-deprecation scripts/check-config.js",
+    "setup:evolution": "node --no-deprecation scripts/setup-evolution.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "openai": "^4.73.0"
+  }
+}

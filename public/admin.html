@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel DAM</title>
+
+<!--
+  A folha de estilo agora é carregada de verdade. A versão anterior tinha um
+  <style> inline duplicado e nunca incluía css/admin.css — por isso as classes
+  status-confirmada / status-pendente / status-cancelada, usadas pelo admin.js,
+  não tinham nenhuma regra e apareciam como texto solto.
+
+  Também não há mais <script> do Supabase aqui: o painel fala com a API deste
+  servidor, que exige senha.
+-->
+<link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div class="login" id="telaLogin">
+  <div class="login-box">
+    <h1>Painel DAM</h1>
+    <p>Área restrita. Informe a senha para continuar.</p>
+    <input id="campoSenha" type="password" placeholder="Senha" autocomplete="current-password">
+    <button id="btnEntrar">Entrar</button>
+    <span class="erro" id="erroLogin"></span>
+  </div>
+</div>
+
+<!-- ===================== PAINEL ===================== -->
+<div id="painel" style="display:none">
+
+  <header>
+    <span>PAINEL ADMINISTRATIVO DAM</span>
+    <button id="btnSair" class="sair">Sair</button>
+  </header>
+
+  <div class="container">
+
+    <div class="cards">
+      <div class="card"><h3>Reservas Hoje</h3><h1 id="hoje">0</h1></div>
+      <div class="card"><h3>Pendentes</h3><h1 id="pendentes">0</h1></div>
+      <div class="card"><h3>Confirmadas</h3><h1 id="confirmadas">0</h1></div>
+      <div class="card"><h3>Canceladas</h3><h1 id="canceladas">0</h1></div>
+    </div>
+
+    <div class="topo">
+      <input id="pesquisa" type="text" placeholder="Pesquisar por nome ou telefone...">
+      <button id="btnAtualizar">Atualizar</button>
+    </div>
+
+    <div class="tabela-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>Data</th>
+            <th>Horário</th>
+            <th>Pessoas</th>
+            <th>Ambiente</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaReservas"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div class="modal" id="modalReserva">
+  <div class="modal-content">
+
+    <h2>Reserva</h2>
+
+    <p><strong>Nome:</strong> <span id="mNome"></span></p>
+    <p><strong>Telefone:</strong> <span id="mTelefone"></span></p>
+    <p><strong>Data:</strong> <span id="mData"></span></p>
+    <p><strong>Horário:</strong> <span id="mHorario"></span></p>
+    <p><strong>Pessoas:</strong> <span id="mPessoas"></span></p>
+    <p><strong>Ambiente:</strong> <span id="mAmbiente"></span></p>
+    <p><strong>Observações:</strong> <span id="mObs"></span></p>
+    <p><strong>Status:</strong> <span id="mStatus"></span></p>
+    <p><strong>Origem:</strong> <span id="mOrigem"></span></p>
+
+    <div class="modal-acoes">
+      <button id="btnConfirmar">Confirmar</button>
+      <button id="btnCancelar">Cancelar</button>
+      <button id="btnExcluir">Excluir</button>
+      <button id="btnFechar">Fechar</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+
+</body>
+</html>

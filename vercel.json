@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "comment": "O site estático continua publicável na Vercel a partir de public/. Atenção: na Vercel só o site funciona — painel, API e chatbot precisam do servidor Node, que roda no Railway.",
+  "outputDirectory": "public",
+  "buildCommand": null,
+  "framework": null
+}
