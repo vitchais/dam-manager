@@ -102,7 +102,7 @@ NODE_ENV=production
 APP_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}
 TZ=America/Cuiaba
 
-SUPABASE_URL=https://sfrovrevzqrfrmmlmpyi.supabase.co
+SUPABASE_URL=https://<ref>.supabase.co   # o <ref> está na URL do painel
 SUPABASE_SERVICE_ROLE_KEY=...        # Supabase → Settings → API
 OPENAI_API_KEY=...                   # platform.openai.com/api-keys
 OPENAI_MODEL=gpt-4o-mini

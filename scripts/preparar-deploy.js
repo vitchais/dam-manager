@@ -113,7 +113,10 @@ async function principal() {
   console.log(negrito('\n1) Supabase'));
   const supabaseUrl = limparUrl(
     await perguntar('URL do projeto', {
-      padrao: anterior.SUPABASE_URL || 'https://sfrovrevzqrfrmmlmpyi.supabase.co',
+      padrao: anterior.SUPABASE_URL || '',
+      // Sem valor padrão de propósito: o ref antigo que estava no repositório
+      // aponta para outro projeto, e errar aqui grava reservas no banco errado.
+      dica: 'https://<ref>.supabase.co — o <ref> está na URL do painel do Supabase',
     }),
   );
   const serviceRole = await perguntar('Chave service_role', {
