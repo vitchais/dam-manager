@@ -3,102 +3,350 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
 <title>Painel DAM</title>
+<meta name="robots" content="noindex, nofollow">
 
-<!--
-  A folha de estilo agora é carregada de verdade. A versão anterior tinha um
-  <style> inline duplicado e nunca incluía css/admin.css — por isso as classes
-  status-confirmada / status-pendente / status-cancelada, usadas pelo admin.js,
-  não tinham nenhuma regra e apareciam como texto solto.
+<!-- A biblioteca do Supabase saiu daqui: o painel agora fala com a API
+     deste servidor (/api/*), que exige senha. Antes, a chave do banco
+     ficava exposta no navegador e qualquer visitante conseguia baixar a
+     lista de clientes com nome e telefone. -->
 
-  Também não há mais <script> do Supabase aqui: o painel fala com a API deste
-  servidor, que exige senha.
--->
-<link rel="stylesheet" href="css/admin.css">
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#111;
+color:#fff;
+}
+
+header{
+background:#ff7a00;
+padding:20px;
+font-size:30px;
+font-weight:bold;
+text-align:center;
+}
+
+.container{
+width:95%;
+max-width:1400px;
+margin:auto;
+padding:30px 0;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
+background:#1d1d1d;
+padding:25px;
+border-radius:12px;
+text-align:center;
+}
+
+.card h3{
+font-size:15px;
+color:#999;
+margin-bottom:10px;
+}
+
+.card h1{
+font-size:42px;
+color:#ff7a00;
+}
+
+.topo{
+display:flex;
+gap:15px;
+margin-bottom:20px;
+}
+
+.topo input{
+flex:1;
+padding:14px;
+border:none;
+border-radius:8px;
+background:#222;
+color:#fff;
+}
+
+.topo button{
+padding:14px 25px;
+background:#ff7a00;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+color:#fff;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#1d1d1d;
+overflow:hidden;
+border-radius:10px;
+}
+
+thead{
+background:#ff7a00;
+}
+
+th{
+padding:15px;
+}
+
+td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #2a2a2a;
+}
+
+tr:hover{
+background:#252525;
+}
+
+button.ver{
+background:#ff7a00;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+color:white;
+}
+
+.modal{
+display:none;
+position:fixed;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.75);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+width:500px;
+max-width:95%;
+background:#1d1d1d;
+padding:25px;
+border-radius:12px;
+}
+
+.modal-content h2{
+margin-bottom:20px;
+}
+
+.modal-content p{
+margin-bottom:12px;
+}
+
+.modal-content button{
+margin-top:15px;
+margin-right:10px;
+}
+
+/* Estas três classes já eram usadas pelo js/admin.js, mas não existiam em
+   lugar nenhum — por isso o status aparecia como texto solto. */
+.status-confirmada,
+.status-pendente,
+.status-cancelada{
+display:inline-block;
+padding:6px 12px;
+border-radius:999px;
+font-size:13px;
+font-weight:bold;
+color:#111;
+}
+
+.status-confirmada{background:#22c55e;}
+.status-pendente{background:#facc15;}
+.status-cancelada{background:#ef4444;color:#fff;}
+
+/* Tela de senha */
+.login{
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:100vh;
+padding:20px;
+}
+
+.login-box{
+background:#1d1d1d;
+padding:35px;
+border-radius:12px;
+width:380px;
+max-width:100%;
+text-align:center;
+}
+
+.login-box h1{color:#ff7a00;margin-bottom:10px;}
+.login-box p{color:#999;font-size:14px;margin-bottom:20px;}
+
+.login-box input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+background:#222;
+color:#fff;
+margin-bottom:12px;
+}
+
+.login-box button{
+width:100%;
+padding:14px;
+background:#ff7a00;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+color:#fff;
+}
+
+.login-box .erro{
+display:block;
+margin-top:12px;
+color:#ef4444;
+font-size:14px;
+min-height:20px;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<!-- ===================== LOGIN ===================== -->
+<!-- Tela de senha. Antes o painel abria direto para qualquer pessoa
+     que soubesse o endereço. -->
 <div class="login" id="telaLogin">
-  <div class="login-box">
-    <h1>Painel DAM</h1>
-    <p>Área restrita. Informe a senha para continuar.</p>
-    <input id="campoSenha" type="password" placeholder="Senha" autocomplete="current-password">
-    <button id="btnEntrar">Entrar</button>
-    <span class="erro" id="erroLogin"></span>
-  </div>
+<div class="login-box">
+<h1>Painel DAM</h1>
+<p>Área restrita. Informe a senha.</p>
+<input id="campoSenha" type="password" placeholder="Senha" autocomplete="current-password">
+<button id="btnEntrar">Entrar</button>
+<span class="erro" id="erroLogin"></span>
+</div>
 </div>
 
-<!-- ===================== PAINEL ===================== -->
 <div id="painel" style="display:none">
 
-  <header>
-    <span>PAINEL ADMINISTRATIVO DAM</span>
-    <button id="btnSair" class="sair">Sair</button>
-  </header>
+<header>
+PAINEL ADMINISTRATIVO DAM
+</header>
 
-  <div class="container">
+<div class="container">
 
-    <div class="cards">
-      <div class="card"><h3>Reservas Hoje</h3><h1 id="hoje">0</h1></div>
-      <div class="card"><h3>Pendentes</h3><h1 id="pendentes">0</h1></div>
-      <div class="card"><h3>Confirmadas</h3><h1 id="confirmadas">0</h1></div>
-      <div class="card"><h3>Canceladas</h3><h1 id="canceladas">0</h1></div>
-    </div>
+<div class="cards">
 
-    <div class="topo">
-      <input id="pesquisa" type="text" placeholder="Pesquisar por nome ou telefone...">
-      <button id="btnAtualizar">Atualizar</button>
-    </div>
+<div class="card">
+<h3>Reservas Hoje</h3>
+<h1 id="hoje">0</h1>
+</div>
 
-    <div class="tabela-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Telefone</th>
-            <th>Data</th>
-            <th>Horário</th>
-            <th>Pessoas</th>
-            <th>Ambiente</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaReservas"></tbody>
-      </table>
-    </div>
+<div class="card">
+<h3>Pendentes</h3>
+<h1 id="pendentes">0</h1>
+</div>
 
-  </div>
+<div class="card">
+<h3>Confirmadas</h3>
+<h1 id="confirmadas">0</h1>
+</div>
+
+<div class="card">
+<h3>Canceladas</h3>
+<h1 id="canceladas">0</h1>
+</div>
 
 </div>
 
-<!-- ===================== MODAL ===================== -->
+<div class="topo">
+
+<input
+id="pesquisa"
+type="text"
+placeholder="Pesquisar reserva...">
+
+<button onclick="carregarReservas()">
+Atualizar
+</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Nome</th>
+<th>Telefone</th>
+<th>Data</th>
+<th>Horário</th>
+<th>Pessoas</th>
+<th>Ambiente</th>
+<th>Status</th>
+<th>Ações</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tabelaReservas">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
 <div class="modal" id="modalReserva">
-  <div class="modal-content">
 
-    <h2>Reserva</h2>
+<div class="modal-content">
 
-    <p><strong>Nome:</strong> <span id="mNome"></span></p>
-    <p><strong>Telefone:</strong> <span id="mTelefone"></span></p>
-    <p><strong>Data:</strong> <span id="mData"></span></p>
-    <p><strong>Horário:</strong> <span id="mHorario"></span></p>
-    <p><strong>Pessoas:</strong> <span id="mPessoas"></span></p>
-    <p><strong>Ambiente:</strong> <span id="mAmbiente"></span></p>
-    <p><strong>Observações:</strong> <span id="mObs"></span></p>
-    <p><strong>Status:</strong> <span id="mStatus"></span></p>
-    <p><strong>Origem:</strong> <span id="mOrigem"></span></p>
+<h2>Reserva</h2>
 
-    <div class="modal-acoes">
-      <button id="btnConfirmar">Confirmar</button>
-      <button id="btnCancelar">Cancelar</button>
-      <button id="btnExcluir">Excluir</button>
-      <button id="btnFechar">Fechar</button>
-    </div>
+<p><strong>Nome:</strong> <span id="mNome"></span></p>
 
-  </div>
+<p><strong>Telefone:</strong> <span id="mTelefone"></span></p>
+
+<p><strong>Data:</strong> <span id="mData"></span></p>
+
+<p><strong>Horário:</strong> <span id="mHorario"></span></p>
+
+<p><strong>Pessoas:</strong> <span id="mPessoas"></span></p>
+
+<p><strong>Ambiente:</strong> <span id="mAmbiente"></span></p>
+
+<p><strong>Observações:</strong> <span id="mObs"></span></p>
+
+<p><strong>Status:</strong> <span id="mStatus"></span></p>
+
+<button id="btnConfirmar">Confirmar</button>
+
+<button id="btnCancelar">Cancelar</button>
+
+<button onclick="fecharModal()">Fechar</button>
+
+</div>
+
 </div>
 
 <script src="js/admin.js"></script>
