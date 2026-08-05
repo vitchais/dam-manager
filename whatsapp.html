@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Conectar WhatsApp — DAM</title>
+<link rel="stylesheet" href="css/admin.css">
+<style>
+  .wa{width:min(560px,95%);margin:40px auto;background:var(--card);border:1px solid #2d2d2d;border-radius:18px;padding:32px;text-align:center}
+  .wa h1{color:var(--primary);font-size:26px;margin-bottom:6px}
+  .wa .sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .estado{display:inline-block;padding:8px 16px;border-radius:999px;font-weight:700;font-size:14px;margin-bottom:20px}
+  .estado.on{background:var(--green);color:#111}
+  .estado.off{background:var(--yellow);color:#111}
+  .estado.erro{background:var(--red);color:#fff}
+  .wa button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:14px 22px;font-weight:700;cursor:pointer;margin:6px}
+  .wa button:disabled{opacity:.5;cursor:not-allowed}
+  .qr{background:#fff;padding:16px;border-radius:12px;display:inline-block;margin:18px 0}
+  .qr img{width:260px;height:260px;display:block}
+  .passos{text-align:left;background:#141414;border-radius:10px;padding:16px 20px;margin-top:18px;font-size:14px;color:var(--muted)}
+  .passos li{margin:6px 0}
+  .msg{margin-top:16px;font-size:14px;min-height:20px}
+  .msg.erro{color:var(--red)}
+  .msg.ok{color:var(--green)}
+  .pend{text-align:left;background:#2a1a1a;border:1px solid #5a2d2d;border-radius:10px;padding:16px 20px;margin-top:18px;font-size:14px}
+  .pend b{color:var(--red)}
+  .links{margin-top:22px;font-size:14px}
+  .links a{color:var(--primary)}
+</style>
+</head>
+<body>
+
+<div class="login" id="telaLogin">
+  <div class="login-box">
+    <h1>Conectar WhatsApp</h1>
+    <p>Área restrita. Informe a senha do painel.</p>
+    <input id="campoSenha" type="password" placeholder="Senha" autocomplete="current-password">
+    <button id="btnEntrar">Entrar</button>
+    <span class="erro" id="erroLogin"></span>
+  </div>
+</div>
+
+<div id="conteudo" style="display:none">
+  <div class="wa">
+    <h1>Conectar WhatsApp</h1>
+    <p class="sub">Instância: <strong id="nomeInstancia">—</strong></p>
+
+    <div id="estado" class="estado off">verificando...</div>
+
+    <div id="areaPendencias"></div>
+
+    <div>
+      <button id="btnPreparar">1. Preparar conexão</button>
+      <button id="btnQr">2. Gerar QR Code</button>
+      <button id="btnAtualizar">Atualizar status</button>
+    </div>
+
+    <div id="areaQr"></div>
+    <div id="mensagem" class="msg"></div>
+
+    <ol class="passos">
+      <li>Clique em <strong>Preparar conexão</strong> — cria a instância e cadastra o webhook.</li>
+      <li>Clique em <strong>Gerar QR Code</strong>.</li>
+      <li>No celular do DAM: WhatsApp → Configurações → <strong>Aparelhos conectados</strong> → <strong>Conectar aparelho</strong>.</li>
+      <li>Aponte a câmera para o QR Code desta tela.</li>
+      <li>O status vira <strong>conectado</strong> sozinho. Mande uma mensagem de outro celular para testar.</li>
+    </ol>
+
+    <div class="links">
+      <a href="/admin.html">Painel de reservas</a> ·
+      <a href="/status" target="_blank">Diagnóstico técnico</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHAVE = 'dam_admin_senha';
+const $ = (id) => document.getElementById(id);
+let timerStatus = null;
+
+const senha = () => sessionStorage.getItem(CHAVE) ?? '';
+
+async function api(caminho, opcoes = {}) {
+  const r = await fetch('/api/whatsapp' + caminho, {
+    ...opcoes,
+    headers: { 'Content-Type': 'application/json', 'x-admin-password': senha() },
+  });
+  if (r.status === 401) {
+    sessionStorage.removeItem(CHAVE);
+    mostrarLogin('Sessão expirada.');
+    throw new Error('nao-autenticado');
+  }
+  const dados = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(dados.erro ?? ('Erro ' + r.status));
+  return dados;
+}
+
+function mostrarLogin(msg = '') {
+  $('telaLogin').style.display = 'flex';
+  $('conteudo').style.display = 'none';
+  $('erroLogin').textContent = msg;
+  if (timerStatus) clearInterval(timerStatus);
+}
+
+function mostrarConteudo() {
+  $('telaLogin').style.display = 'none';
+  $('conteudo').style.display = 'block';
+}
+
+function aviso(texto, tipo = '') {
+  $('mensagem').textContent = texto;
+  $('mensagem').className = 'msg ' + tipo;
+}
+
+function desenharPendencias(p, configurado) {
+  const faltas = [];
+  if (p?.evolution) faltas.push('EVOLUTION_API_URL e EVOLUTION_API_KEY');
+  if (p?.webhookToken) faltas.push('WEBHOOK_TOKEN');
+  if (p?.supabase) faltas.push('SUPABASE_SERVICE_ROLE_KEY');
+  if (p?.openai) faltas.push('OPENAI_API_KEY');
+
+  if (faltas.length === 0) { $('areaPendencias').innerHTML = ''; return; }
+
+  $('areaPendencias').innerHTML =
+    '<div class="pend"><b>Faltam variáveis no Railway:</b><ul>' +
+    faltas.map((f) => '<li>' + f + '</li>').join('') +
+    '</ul>Preencha em Variables e aguarde o redeploy.</div>';
+
+  // Sem a Evolution configurada não há o que conectar.
+  $('btnPreparar').disabled = !configurado;
+  $('btnQr').disabled = !configurado;
+}
+
+function desenharEstado(d) {
+  $('nomeInstancia').textContent = d.instancia ?? '—';
+  const el = $('estado');
+
+  if (!d.configurado) {
+    el.className = 'estado erro';
+    el.textContent = 'Evolution API não configurada';
+  } else if (d.conectado) {
+    el.className = 'estado on';
+    el.textContent = '✓ WhatsApp conectado';
+    $('areaQr').innerHTML = '';
+    if (d.chatbotCompleto) {
+      aviso('Tudo pronto. O bot já responde as mensagens que chegarem.', 'ok');
+    } else {
+      aviso('Número conectado, mas ainda faltam variáveis para o bot responder.', 'erro');
+    }
+  } else if (d.existe) {
+    el.className = 'estado off';
+    el.textContent = 'aguardando leitura do QR Code (' + d.estado + ')';
+  } else {
+    el.className = 'estado off';
+    el.textContent = 'instância ainda não criada';
+  }
+
+  desenharPendencias(d.pendencias, d.configurado);
+}
+
+async function carregarStatus() {
+  try {
+    desenharEstado(await api('/status'));
+  } catch (e) {
+    if (e.message !== 'nao-autenticado') aviso(e.message, 'erro');
+  }
+}
+
+async function preparar() {
+  $('btnPreparar').disabled = true;
+  aviso('Preparando...');
+  try {
+    const d = await api('/setup', { method: 'POST' });
+    aviso((d.passos ?? []).join(' '), 'ok');
+    desenharEstado({ ...d, configurado: true });
+  } catch (e) {
+    if (e.message !== 'nao-autenticado') aviso(e.message, 'erro');
+  } finally {
+    $('btnPreparar').disabled = false;
+  }
+}
+
+async function gerarQr() {
+  $('btnQr').disabled = true;
+  aviso('Gerando QR Code...');
+  try {
+    const d = await api('/qrcode');
+    if (d.conectado) {
+      aviso('O número já está conectado.', 'ok');
+      $('areaQr').innerHTML = '';
+    } else if (d.qrcode) {
+      $('areaQr').innerHTML = '<div class="qr"><img alt="QR Code do WhatsApp" src="' + d.qrcode + '"></div>';
+      aviso('Escaneie com o celular do DAM. O QR expira em ~40s — gere outro se precisar.');
+    } else if (d.codigo) {
+      $('areaQr').innerHTML = '<p>Código de pareamento: <strong>' + d.codigo + '</strong></p>';
+    }
+  } catch (e) {
+    if (e.message !== 'nao-autenticado') aviso(e.message, 'erro');
+  } finally {
+    $('btnQr').disabled = false;
+  }
+}
+
+async function entrar() {
+  const valor = $('campoSenha').value;
+  if (!valor) { $('erroLogin').textContent = 'Digite a senha.'; return; }
+  sessionStorage.setItem(CHAVE, valor);
+  try {
+    await api('/status');
+    $('campoSenha').value = '';
+    mostrarConteudo();
+    iniciar();
+  } catch (e) {
+    sessionStorage.removeItem(CHAVE);
+    $('erroLogin').textContent = e.message === 'nao-autenticado' ? 'Senha inválida.' : e.message;
+  }
+}
+
+function iniciar() {
+  carregarStatus();
+  // Enquanto a página estiver aberta, confirma sozinha quando o pareamento sai.
+  if (timerStatus) clearInterval(timerStatus);
+  timerStatus = setInterval(carregarStatus, 5000);
+}
+
+$('btnEntrar').addEventListener('click', entrar);
+$('campoSenha').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar(); });
+$('btnPreparar').addEventListener('click', preparar);
+$('btnQr').addEventListener('click', gerarQr);
+$('btnAtualizar').addEventListener('click', carregarStatus);
+
+if (senha()) {
+  api('/status').then(() => { mostrarConteudo(); iniciar(); }).catch(() => mostrarLogin());
+} else {
+  mostrarLogin();
+}
+</script>
+
+</body>
+</html>

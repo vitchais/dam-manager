@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel DAM</title>
+<meta name="robots" content="noindex, nofollow">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- A biblioteca do Supabase saiu daqui: o painel agora fala com a API
+     deste servidor (/api/*), que exige senha. Antes, a chave do banco
+     ficava exposta no navegador e qualquer visitante conseguia baixar a
+     lista de clientes com nome e telefone. -->
 
 <style>
 
@@ -154,11 +158,92 @@ margin-top:15px;
 margin-right:10px;
 }
 
+/* Estas três classes já eram usadas pelo js/admin.js, mas não existiam em
+   lugar nenhum — por isso o status aparecia como texto solto. */
+.status-confirmada,
+.status-pendente,
+.status-cancelada{
+display:inline-block;
+padding:6px 12px;
+border-radius:999px;
+font-size:13px;
+font-weight:bold;
+color:#111;
+}
+
+.status-confirmada{background:#22c55e;}
+.status-pendente{background:#facc15;}
+.status-cancelada{background:#ef4444;color:#fff;}
+
+/* Tela de senha */
+.login{
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:100vh;
+padding:20px;
+}
+
+.login-box{
+background:#1d1d1d;
+padding:35px;
+border-radius:12px;
+width:380px;
+max-width:100%;
+text-align:center;
+}
+
+.login-box h1{color:#ff7a00;margin-bottom:10px;}
+.login-box p{color:#999;font-size:14px;margin-bottom:20px;}
+
+.login-box input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+background:#222;
+color:#fff;
+margin-bottom:12px;
+}
+
+.login-box button{
+width:100%;
+padding:14px;
+background:#ff7a00;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+color:#fff;
+}
+
+.login-box .erro{
+display:block;
+margin-top:12px;
+color:#ef4444;
+font-size:14px;
+min-height:20px;
+}
+
 </style>
 
 </head>
 
 <body>
+
+<!-- Tela de senha. Antes o painel abria direto para qualquer pessoa
+     que soubesse o endereço. -->
+<div class="login" id="telaLogin">
+<div class="login-box">
+<h1>Painel DAM</h1>
+<p>Área restrita. Informe a senha.</p>
+<input id="campoSenha" type="password" placeholder="Senha" autocomplete="current-password">
+<button id="btnEntrar">Entrar</button>
+<span class="erro" id="erroLogin"></span>
+</div>
+</div>
+
+<div id="painel" style="display:none">
 
 <header>
 PAINEL ADMINISTRATIVO DAM
@@ -230,6 +315,8 @@ Atualizar
 
 </div>
 
+</div>
+
 <div class="modal" id="modalReserva">
 
 <div class="modal-content">
@@ -262,7 +349,6 @@ Atualizar
 
 </div>
 
-<script src="supabase.js"></script>
 <script src="js/admin.js"></script>
 
 </body>

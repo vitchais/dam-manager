@@ -2,7 +2,24 @@
 :root{--bg:#111;--card:#1d1d1d;--card2:#252525;--primary:#ff7a00;--text:#fff;--muted:#9b9b9b;--green:#22c55e;--yellow:#facc15;--red:#ef4444}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
 body{background:var(--bg);color:var(--text)}
-header{background:linear-gradient(90deg,#ff7a00,#ff9f43);padding:22px;text-align:center;font-size:30px;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,.35)}
+header{background:linear-gradient(90deg,#ff7a00,#ff9f43);padding:22px;text-align:center;font-size:30px;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;position:relative}
+header .sair{position:absolute;right:20px;font-size:14px;padding:10px 16px;background:rgba(0,0,0,.3);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700}
+header .sair:hover{background:rgba(0,0,0,.5)}
+
+/* ===== Tela de login ===== */
+.login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--card);border:1px solid #2d2d2d;border-radius:18px;padding:36px;width:min(400px,100%);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-box h1{color:var(--primary);margin-bottom:10px;font-size:30px}
+.login-box p{color:var(--muted);font-size:14px;margin-bottom:22px}
+.login-box input{width:100%;padding:14px 16px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:10px;outline:none;margin-bottom:14px}
+.login-box input:focus{border-color:var(--primary)}
+.login-box button{width:100%;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:700;cursor:pointer}
+.login-box .erro{display:block;margin-top:14px;color:var(--red);font-size:14px;min-height:20px}
+
+/* Deixa a tabela rolar sozinha no celular em vez de esticar a página. */
+.tabela-wrap{width:100%;overflow-x:auto}
+.modal-acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+#btnExcluir{background:var(--red)}
 .container{width:min(1400px,95%);margin:auto;padding:30px 0}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:25px}
 .card{background:var(--card);border:1px solid #2d2d2d;border-radius:16px;padding:24px;text-align:center;transition:.2s}
