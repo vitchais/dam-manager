@@ -6,7 +6,7 @@ Um único processo Node serve tudo:
 
 | Rota | O que é |
 |---|---|
-| `/` | Site do DAM (`public/index.html`) |
+| `/` | Site do DAM (`index.html`, intocado) |
 | `/admin.html` | Painel de reservas, protegido por senha |
 | `/whatsapp.html` | Conectar o WhatsApp (QR Code), protegido por senha |
 | `/api/*` | API do painel |
@@ -104,15 +104,20 @@ clientes com nome e telefone.
 ## Deploy
 
 - **Aplicação + chatbot:** Railway. Ver [`docs/EVOLUTION-RAILWAY.md`](docs/EVOLUTION-RAILWAY.md).
-- **Só o site estático:** continua publicável na Vercel a partir de `public/`
-  (`vercel.json`), mas nessa modalidade painel, API e chatbot **não** funcionam.
+- **Só o site estático:** os arquivos continuam na raiz do repositório, então a
+  publicação atual na Vercel segue funcionando sem nenhuma mudança de config.
+  Nessa modalidade, porém, painel, API e chatbot **não** funcionam — eles
+  precisam do servidor Node.
 
 ---
 
 ## Estrutura
 
 ```
-public/            site, painel, css, imagens
+index.html         site do DAM (não tocado por esta integração)
+admin.html         painel de reservas
+whatsapp.html      conectar o número
+css/ js/           recursos do painel
 src/
   server.js        Express: estático + API + webhook
   config/env.js    leitura e validação das variáveis de ambiente

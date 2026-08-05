@@ -24,7 +24,18 @@ import { whatsappRouter } from './routes/whatsapp.js';
 import { healthRouter } from './routes/health.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIRETORIO_PUBLICO = path.join(__dirname, '..', 'public');
+const RAIZ = path.join(__dirname, '..');
+
+// Os arquivos do site continuam na raiz do repositório, como sempre estiveram.
+// Por isso NÃO servimos o diretório inteiro: isso deixaria .env, src/ e
+// package.json acessíveis pela web. Servimos uma lista fechada de arquivos.
+const ARQUIVOS_PUBLICOS = new Set([
+  'index.html',
+  'admin.html',
+  'whatsapp.html',
+  'og-image.png',
+  'preview.png',
+]);
 
 const app = express();
 
@@ -50,15 +61,24 @@ app.use('/api/whatsapp', whatsappRouter);
 app.use('/api', apiRouter);
 app.use('/webhook', webhookRouter);
 
-app.use(
-  express.static(DIRETORIO_PUBLICO, {
-    extensions: ['html'],
-    maxAge: env.isProduction ? '1h' : 0,
-  }),
-);
+// css/ e js/ contêm apenas recursos estáticos, então podem ir inteiros.
+const opcoesEstaticas = { maxAge: env.isProduction ? '1h' : 0 };
+app.use('/css', express.static(path.join(RAIZ, 'css'), opcoesEstaticas));
+app.use('/js', express.static(path.join(RAIZ, 'js'), opcoesEstaticas));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(RAIZ, 'index.html'));
+});
+
+// Um arquivo só é servido se estiver na lista. Como a comparação é contra um
+// Set, ".." e afins simplesmente não casam — não há travessia de diretório.
+app.get('/:arquivo', (req, res, next) => {
+  if (!ARQUIVOS_PUBLICOS.has(req.params.arquivo)) return next();
+  return res.sendFile(path.join(RAIZ, req.params.arquivo));
+});
 
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(DIRETORIO_PUBLICO, 'index.html'));
+  res.status(404).sendFile(path.join(RAIZ, 'index.html'));
 });
 
 // Handler de erro do Express (4 argumentos são obrigatórios para ele registrar).
